@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+ 
+<meta charset="utf-8">
+<!--<base href="http://mozillareps.org/fx4presentation/">-->
+<title>Jetpack - Adding to the Firefox UI</title>
+ 
+<script src="core/core.js"></script>
+<style> @import url(core/core.css);</style>
+
+ 
+
+<style>
+  code {
+    font-size: 0.6em;
+  }
+  li {
+    font-size: -1;
+  }
+</style>
+
+<!--
+
+TODO
+
+* check everthing in to github
+* put sample add-on on builder
+
+-->
+
+  
+<section id="intro">
+  <!--<img src="img/firefox.png">-->
+  <h1 class="boldfont">
+    <span class="redfont">Jetpack</span>
+  </h1>
+  <br><br>
+  <h3>
+    <span class="greyfont">Adding to the Firefox UI</span>
+  </h3>
+</section>
+
+<section>
+  <h1>Approach</h1>
+  <ul>
+    <li>Learning from the prototype
+    </li><li>Firefox UI/UX work
+    </li><li>Get out of the way
+    </li><li>No built-in menu or toolbar support
+  </li></ul>
+</section>
+
+<section>
+  <h1>Capabilities</h1>
+  <ul>
+    <li>Interactions with web content
+    </li><li>Transient/contextual UI
+    </li><li>User control, customizability
+  </li></ul>
+</section>
+
+<section>
+  <h1>Core UI Modules</h1>
+  <ul>
+    <li>Context-menu
+    </li><li>Widget
+    </li><li>Panel
+    </li><li>Notifications
+  </li></ul>
+</section>
+
+<section>
+  <h1>Context-menu</h1>
+  <ul>
+    <li>Add items to the context menu of web pages
+    </li><li>Can add sub-menus
+    </li><li>Contextual visibility based on:
+      <ul>
+      <li>URL
+      </li><li>Page content
+      </li><li>Selection
+      </li><li>Content scripts
+      </li></ul>
+  </li></ul>
+</section>
+
+<section>
+  <h1>Context-menu Example</h1>
+  <code>
+  <pre>    let contextMenu = require('context-menu');
+    contextMenu.Item({
+      label: 'Search Stack Overflow',
+      image: require('self').data.url('favicon.ico'),
+      context: contextMenu.SelectionContext(),
+      contentScript: 'self.on("click", self.postMessage);',
+      onClick: function () {
+        let selection = require('selection').text;
+        let url = 'http://stackoverflow.com/search?q=' + selection;
+        require('tabs').open(url);
+      }
+    });
+  </pre>
+  </code>
+</section>
+
+<section>
+  <h1>Context-menu Example - Breakdown</h1>
+  <ol>
+    <li>
+      <code>image: require('self').data.url('favicon.ico')</code>
+      <br><span>An image to show adjacent to the label.</span>
+    </li><li>
+      <code>context: contextMenu.SelectionContext()</code>
+      <br><span>Only show menu item if there is a selection.</span>
+    </li><li>
+      <code>contentScript: 'self.on("click", self.postMessage);',</code>
+      <br><span>Handle the click on the context menu.</span>
+    </li><li>
+      <code>let selection = require('selection').text;</code>
+      <br><span>Get the selected text in the web page.</span>
+    </li><li>
+      <code>require('tabs').open(url);</code>
+      <br><span>Open the search results in a new tab.</span>
+    </li>
+  </ol>
+</section>
+
+<section>
+  <h1>Widget</h1>
+  <ul>
+    <li>Located in the add-on bar
+    </li><li>Image, text or web content
+    </li><li>Position is customizable by the user
+    </li><li>Customizable size
+  </li></ul>
+</section>
+
+<section>
+  <h1>Widget Example</h1>
+  <code>
+  <pre>    // extended version: dynamically update w/ number of posts
+    require("widget").Widget({
+      id: "StackOverflowJetpack",
+      label: "Stack Overflow Search - Jetpack",
+      contentURL: require('self').data.url('favicon.ico'),
+      onClick: function() {
+        require('tabs').open('http://stackoverflow.com/search?q=jetpack');
+      }
+    });
+  </pre>
+  </code>
+</section>
+
+<section>
+  <h1>Widget Example - Breakdown</h1>
+  <ol>
+    <li>
+      <code>id: "StackOverflowJetpack",</code>
+      <br><span>Required for customization</span>
+    </li><li>
+      <code>label: "Stack Overflow Search - Jetpack",</code>
+      <br><span>Optional, shows in the tooltip</span>
+    </li><li>
+      <code>contentURL: require('self').data.url('favicon.ico'),</code>
+      <br><span>Visible content of the widget - text, image or URL</span>
+    </li><li>
+      <code> require('tabs').open('http://stackoverflow.com/search?q=jetpack');</code>
+      <br><span>Open the URL in a new tab</span>
+  </li></ol>
+</section>
+
+<section>
+  <h1>Panel</h1>
+  <ul>
+    <li>Modal popup that overlays content/browser
+    </li><li>For temporary UI, easily dismissed
+    </li><li>Can anchor to other parts of the UI
+  </li></ul>
+</section>
+
+<section>
+  <h1>Panels are fun.</h1>
+  <pre>    * screenshot: reddit panel
+    * screenshot: peek
+    * screenshot: wikipedia treemap
+  </pre>
+</section>
+
+<section>
+  <h1>Panel Example</h1>
+  <code>
+  <pre>    var panel = require("panel").Panel({
+      contentURL: 'http://stackoverflow.com/search?q=jetpack'
+    });
+
+    require("widget").Widget({
+      id: "StackOverflowJetpack",
+      label: "Stack Overflow Search - Jetpack",
+      contentURL: require('self').data.url('favicon.ico'),
+      panel: panel
+    });
+  </pre>
+  </code>
+</section>
+
+<section>
+  <h1>Panel Example - Breakdown</h1>
+  <ol>
+    <li>
+      <code>contentURL: 'http://stackoverflow.com/search?q=jetpack'</code>
+      <br><span>The visible contents of the panel. Can be a remote or local URL.</span>
+    </li><li>
+      <code>
+    require("widget").Widget({
+      panel: panel
+      </code>
+      <br><span>Link the panel to the Widget. Triggered by clicking.</span>
+  </li></ol>
+</section>
+
+<section>
+  <h1>Notifications</h1>
+  <ul>
+    <li>Transient "toaster" notifications
+    </li><li>Uses Growl on Mac
+    </li><li>Uses LibNotify on Linux
+    </li><li>In-app notifications on Windows
+  </li></ul>
+</section>
+
+<section>
+  <h1>Notifications Example</h1>
+  <code>
+  <pre>    require("notifications").notify({
+      text: "New Stack Overflow Question!",
+      iconURL: require('self').data.url('favicon.ico')
+    });
+  </pre>
+  </code>
+</section>
+
+<section>
+  <h1>Notifications Example - Breakdown</h1>
+  <ol>
+    <li>
+      <code>text: "New Stack Overflow Question!",</code>
+      <br><span>The text to show in the notification</span>
+    </li><li>
+      <code>iconURL: require('self').data.url('favicon.ico')</code>
+      <br><span>The URL of the image to show in the notification</span>
+  </li></ol>
+</section>
+
+<section>
+  <h1>Advanced Notifications Example</h1>
+  <code>
+  <pre>    var count = 0;
+    require('timers').setInterval(function() {
+      require('page-worker').Page({
+        contentURL: 'http://stackoverflow.com/search?q=jetpack',
+        contentScript: 'self.postMessage({count: document.querySelector(".summarycount")});',
+        onMessage: function(msg) {
+          if (msg.count &gt; count) {
+            require('notifications').notify({
+              text: 'New Stack Overflow Question: ' + msg.count,
+              iconURL: require('self').data.url('favicon.ico')
+            });
+          }
+          this.destroy();
+        }
+      });
+    }, 5 * 60 * 1000);
+  </pre>
+  </code>
+</section>
+
+<section>
+  <h1>Other/Future UI</h1>
+  <ul>
+    <li>Toolbars, toolbar buttons
+    </li><li>Menus, menu-items
+    </li><li>Sidebars, slidebars
+    </li><li>In-content UI
+    </li><li>Vertical toolbars
+  </li></ul>
+</section>
+
+<section>
+  <h1>DIY UI</h1>
+  <ul>
+    <li>Modules: https://wiki.mozilla.org/Labs/Jetpack/Modules
+    </li><li>Packages: https://builder.addons.mozilla.org/search/?type=l
+  </li></ul>
+</section>
+
+<section>
+  <h1>THANKS</h1>
+  <ul>
+    <li>Dietrich Ayala (@dietrich)
+    </li><li>dietrich@mozilla.com
+    </li><li>http://autonome.wordpress.com
+  </li></ul>
+</section>

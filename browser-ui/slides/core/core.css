@@ -1,0 +1,111 @@
+@font-face  {
+  font-family: fface;
+  src: local("MetaBookLF-Roman"), url("http://mozillareps.org/fx4presentation/MtBkLfRg.ttf");
+}
+@font-face  { 
+  font-family: ffacebold; 
+  src: local("MetaBold-Roman"), url("http://mozillareps.org/fx4presentation/MtBdRg__.ttf");
+}
+
+html { 
+  overflow: hidden; 
+}
+
+body, html { 
+  height: 100%; 
+  padding: 0px; 
+}
+
+body { 
+  margin: auto; 
+  position: relative; 
+}
+
+img, video { 
+  vertical-align: middle;
+}
+
+section > div { 
+  width: 100%; 
+  display: -moz-box;
+  -moz-box-orient : vertical;
+  -moz-box-pack : top;
+  -moz-box-align : center;
+}
+
+.flex-wrapper { 
+  display: -moz-box;
+  -moz-box-orient: horizontal;
+  width: 100%;
+}
+
+section h1, section p {
+  text-align: center;
+  margin: .3em;
+  margin: 0;
+  padding: 0;
+}
+
+section h1 {
+  margin-top: 60px; 
+  margin-bottom: 60px; 
+  font-family: ffacebold; 
+  font-weight:normal;
+}
+
+a { color: black!important; text-decoration: none; }
+
+body {
+  background-image: -moz-linear-gradient(top, #333, #333), -moz-linear-gradient(top, rgba(255, 255, 255, 0), white 30%), -moz-linear-gradient(left, #DCEFFD, #DCEFFD 30%, #E8F5FF 50%, #DCEFFD 70%,#DCEFFD);
+  background-size: 100% 20px, 100% 100%, 10px 100%;
+  background-repeat: no-repeat, no-repeat, repeat-x;
+  background-position: bottom left, top left, top left;
+}
+body:after {
+  content: "mozilla";
+  position: fixed;
+  bottom: 25px; right: 5px;
+  font-family: ffacebold;
+  color: rgb(100,100,100);
+  font-size: 30px;
+}
+
+section {
+    display: none;
+    font-family: fface;
+    font-size: 40px;
+    color: black;
+}
+
+.loaded  section{ display: block; }
+
+ul li {list-style-type:none; line-height: 60px;}
+ul li:before { content: "> "; }
+
+ol li span {
+  font-size: 0.6em;
+}
+
+section { -moz-transition-property: -moz-transform, opacity; -moz-transition-duration: 0.3s, 0.3s; pointer-events: none; width: 100%; margin: auto; position: absolute; padding: 0 10px; -moz-box-sizing: border-box; }
+section[aria-selected] { pointer-events: auto; -moz-transition-delay: 0.3s, 0.3s;}
+
+section { -moz-transform: translateX(-100%); opacity: 1;}
+section[aria-selected] { -moz-transform: none; opacity: 1;}
+section[aria-selected] ~ section { -moz-transform: translateX(100%); opacity: 1;}
+
+#intro > div {-moz-box-pack : center;}
+#intro > div > * { display: inline; }
+#intro h1 { font-size: 100px; margin-left: 30px; }
+
+.boldfont {
+  font-family: ffacebold;
+  font-weight: normal;
+}
+
+.redfont {
+  color: rgb(224,38,0);
+}
+
+.greyfont {
+  color: rgb(100,100,100);
+}
