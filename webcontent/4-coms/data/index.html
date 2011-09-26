@@ -1,0 +1,23 @@
+<html lang="en">    
+<head>
+<title>Some title</title>
+<script type="application/x-javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="application/x-javascript">
+
+$(document).ready(function() {
+    $("#clicker").click(function() {
+        window.postMessage("sending message from page!", "*");
+        return false;
+    });
+});
+
+</script>
+</head>
+<body>
+
+<div>
+    <input type="button" name="clicker" id="clicker" value="Send Message"/>
+</div>
+
+</body>
+</html>
