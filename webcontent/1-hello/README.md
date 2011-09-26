@@ -1,5 +1,5 @@
-This is the 1-hello add-on.  It contains:
+## Hello World
 
-* A program (lib/main.js).
-* A few tests.
-* Some meager documentation.
+Online version available here:
+
+<a href="https://builder.addons.mozilla.org/addon/1018002/revision/2/">https://builder.addons.mozilla.org/addon/1018002/revision/2/</a>
