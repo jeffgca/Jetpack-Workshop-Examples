@@ -92,7 +92,7 @@ TODO
       image: require('self').data.url('favicon.ico'),
       context: contextMenu.SelectionContext(),
       contentScript: 'self.on("click", self.postMessage);',
-      onClick: function () {
+      onMessage: function () {
         let selection = require('selection').text;
         let url = 'http://stackoverflow.com/search?q=' + selection;
         require('tabs').open(url);
