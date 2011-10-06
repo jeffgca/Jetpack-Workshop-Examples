@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+
+<meta charset="utf-8">
+<title>Jetpack Modules: The Key To Generativity</title>
+
+<!-- Your Slides -->
+<!-- One section is one slide -->
+
+<section class="slide">
+    <!-- This is the first slide -->
+<h1>Jetpack Modules: The Key To Generativity</h1>
+<br>
+<div align="center" class="fixed" style="color: blue">http://people.mozilla.com/~bwarner/jetpack-workshop/</div>
+<div align="center" class="fixed" style="color: blue">(http://bit.ly/qV9r9m)</div>
+<div class="fixed">
+  <pre>
+
+
+  const api = require("api");
+
+  exports.foo = function(arg1, arg2) {
+      var bar = api.something(arg1);
+      return bar + arg2;
+  };
+  </pre></div>
+<footer>Brian Warner, Mozilla Labs
+<div class="fixed">warner<span>@</span>mozilla.com</div></footer>
+<div class="left-footer"><a rel="license" href="http://creativecommons.org/licenses/by-sa/3.0/"><img alt="Creative Commons License" height="15" width="80" style="border-width:0" src="by-sa-3.0-80x15.png" /></a></div>
+<details>notes go here</details>
+</section>
+
+<section class="slide">
+<h1>What Are Jetpack Modules?</h1>
+<br>
+<ul>
+  <li>Based on CommonJS:</li>
+  <li><tt>const foo = require("foo"); foo.thing();</tt></li>
+  <li>foo.js: <tt>exports.thing = function(){};</tt></li>
+</ul>
+<img class="panel" src="01-modules.svg">
+<details>
+<ul>
+  <li>notes</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>How does Jetpack use modules?</h1>
+<br>
+<img class="panel" src="01a-sdk-modules.svg">
+<details>
+<ul>
+  <li>If you like to think in terms of compilers, then the addon-sdk is like
+  a library of javascript modules, and a linker that combines your code with
+  the necessary parts of the library.</li>
+  <li>The XPI file is the output, and can be installed in firefox</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Why?</h1>
+<br>
+<ul>
+  <li>Code Isolation</li>
+  <li>Code Reuse</li>
+  <li>Security Isolation</li>
+</ul>
+<details>
+<ul>
+  <li>I'm going to talk about three reasons that modules are a great
+  idea.</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Code Isolation</h1>
+<br>
+<ul>
+  <li>Each module has a separate namespace</li>
+</ul>
+<img class="panel" src="02-namespaces.svg">
+<details>
+<ul>
+  <li>the web hasn't traditionally provided JS with a good
+  environment for programming in the large, so this may be new
+  territory.</li>
+  <li>First off, using a &lt;script&gt; tag means your namespace is changed
+  unpredictably. If you're lucky, the library author plays nice. Even the
+  good techniques require global coordination of names.</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Code Isolation</h1>
+<br>
+<ul>
+  <li>Abstraction boundaries and stable interfaces enable parallel
+  development</li>
+</ul>
+<img class="panel" src="02b-implementations.svg">
+<details>
+<ul>
+  <li>Second, modules provide a boundary between units of code. By providing
+  a stable interface, you can hide the internal implementation details, and
+  change them without affecting your callers. This helps "plan coordination":
+  once you've defined the interface, separate groups can work on the
+  implementation in parallel.</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Code Reuse</h1>
+<ul>
+  <li>Modules are good containers to share code</li>
+  <li>Copy a module instead of cut-and-pasting lines of code</li>
+  <li>Flightdeck makes it easy!</li>
+</ul>
+<img class="panel" src="03-reuse.svg">
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Exercise: Make a Module</h1>
+<br>
+<ul>
+  <li>Take a base64 encoder and turn it into a Jetpack module</li>
+  <li><a class="fixed" href="https://github.com/warner/jetpack-base64-demo">https://github.com/warner/jetpack-base64-demo</a></li>
+  <li><a class="fixed" href="http://www.webtoolkit.info/javascript-base64.html">http://www.webtoolkit.info/javascript-base64.html</a></li>
+</ul>
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+
+
+<section class="slide">
+<h1>Security Isolation</h1>
+<br>
+<ul>
+  <li>Modules can hide their internal objects</li>
+  <li>Callers can only invoke exposed methods</li>
+  <li>Provide limited access to your callers</li>
+</ul>
+<img class="panel" src="04-hide.svg">
+<details>
+</details>
+</section>
+
+<section class="slide">
+<h1>POLA</h1>
+<ul>
+  <li>Principle Of Least Authority</li>
+  <li>Limits the damage of bugs or compromise</li>
+  <li>Bad code doesn't have access to everything</li>
+</ul>
+<img class="panel" src="05-pola.svg">
+<details>
+<ul>
+  <li>reviewers can study code to see what it will do, until an eval()</li>
+  <li>worst case, the entire module is now under control of the attacker</li>
+  <li>the evil code wakes up and looks around to see what damage it can do</li>
+  <li>the only influence it has is via the twitter.js module</li>
+  <li>there are other interesting+powerful objects in the browser, but this
+  module doesn't have a reference to them</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Add-On Manifest</h1>
+<br>
+<ul>
+  <li>require() is special: scanned during XPI build</li>
+  <li>Module graph ("manifest") stored in XPI</li>
+  <li>Enforced at runtime</li>
+</ul>
+<img class="panel" src="06-manifest.svg">
+<details>
+<ul>
+  <li>the reason the evil code can't just require() something more powerful
+  (like xhr) is that require() checks a manifest before loading any code</li>
+  <li>the manifest is generated by scanning the source code for require()
+  statements when the XPI is built, and building up a graph of which modules
+  import which</li>
+  <li>the manifest sets boundaries for the code: it may or may not require()
+  everything on the list, but it cannot import more than this</li>
+  <li>reviewers use the manifest to prioritize code analysis</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Module Guidelines</h1>
+<br>
+<ul>
+  <li>Divide add-ons into separate modules</li>
+  <ul>
+    <li>Help other people re-use your code</li>
+  </ul>
+  <li>Split along authority boundaries</li>
+  <li>Put powerful code in a separate module</li>
+  <ul>
+    <li>Keep them small and reviewable</li>
+  </ul>
+</ul>
+<img class="panel" src="07-powerful.svg">
+<details>
+<ul>
+  <li>you don't actually need to know about the manifest, it's handled for
+  you</li>
+  <li>but you can help reviewers by building your addon with a clean module
+  structure</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Exercise: Github Status</h1>
+<br>
+<ul>
+  <li>GitHub: a git hosting provider</li>
+  <ul class="fixed">
+    <li><a href="http://developer.github.com/v3/">http://developer.github.com/v3/</a></li>
+    <li><a href="http://developer.github.com/v3/git/refs/">http://developer.github.com/v3/git/refs/</a></li>
+  </ul>
+  <li>Jetpack SDK code lives at <ul><a class="fixed" href="https://github.com/mozilla/addon-sdk">https://github.com/mozilla/addon-sdk</a></ul></li>
+  <li>Here is an addon to follow changes in Jetpack:</li>
+  <li><a class="fixed" href="https://github.com/warner/jetpack-repo-watcher">https://github.com/warner/jetpack-repo-watcher</a></li>
+</ul>
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Exercise: Github Status</h1>
+<br>
+<img class="panel" src="09-github.svg">
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Exercise: Split It Up</h1>
+<br>
+<img class="panel" src="10-split.svg">
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>More Exercises</h1>
+<br>
+<ul>
+  <li>add password auth for private repos</li>
+  <li>include date of last change</li>
+  <li>watch multiple repos, only show latest change</li>
+  <li>write API module for other sites</li>
+</ul>
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Chrome Modules</h1>
+<br>
+<ul>
+  <li>Use <tt>require("chrome")</tt> to get XPCOM</li>
+</ul>
+<img class="panel" src="08-chrome.svg">
+<details>
+<ul>
+  <li>if you know XPCOM, you can make more APIs available to regular code by
+  writing a "chrome module"</li>
+</ul>
+</details>
+</section>
+
+<section class="slide">
+<h1>Jetpack Modules: The Future</h1>
+<br>
+<ul>
+  <li>require("http://path/to/your/module")</li>
+  <li>always-add "use strict;"</li>
+  <li>require(modname, parameters)</li>
+  <li>Harmony Modules</li>
+</ul>
+<details>
+<ul>
+</ul>
+</details>
+</section>
+
+
+
+<section class="slide">
+<h1>Thanks!</h1>
+<br>
+</section>
+
+<!-- Your Style -->
+<!-- Define the style of you presentation -->
+
+<!-- Maybe a font from http://www.google.com/webfonts ? -->
+<!-- <link href='http://fonts.googleapis.com/css?family=Oswald' rel='stylesheet'> -->
+
+<style>
+  html { background-color: black; }
+  body {background-color: white;}
+  details { font-size: 80% }
+  /* A section is a slide. It's size is 800x600, and this will never change */
+  section {
+      /* The font from Google */
+      font-family: 'Oswald', arial, serif;
+      font-size: 2em;
+  }
+  ul.smaller { font-size: 80%; }
+  h1, h2, h3 {
+      margin-top: 50px;
+      text-align: center;
+  }
+  ul ul { margin-left: 50px; margin-right: 0px; }
+  ul {
+      margin-left: 100px;
+      margin-right: 50px;
+  }
+  a { color: #FF0066; } a:hover {text-decoration: underline;}
+  footer { position: absolute; bottom: 20px; right: 50px; }
+  div.left-footer { position: absolute; bottom: 20px; left: 50px;
+                    font-size: 50% }
+
+  .fixed { font-family: fixed, Courier; font-size: 70% }
+
+  /* the section is 800x600, we put an SVG image below the title */
+  .panel { position: absolute;
+           left: 80px; width: 640px;
+           top: 100px; height: 480px; }
+
+  .checklist {
+    font-size: 40%;
+    position: absolute;
+    left: -80px; width: 150px;
+    top: 400px;
+  }
+
+
+  /* Transition effect */
+  /* Feel free to change the transition effect for original
+     animations. See here:
+     https://developer.mozilla.org/en/CSS/CSS_transitions
+     How to use CSS3 Transitions: */
+  section.slide {
+      -moz-transition: left 400ms linear 0s;
+      -webkit-transition: left 400ms linear 0s;
+      -o-transition: left 400ms linear 0s;
+      -ms-transition: left 400ms linear 0s;
+      transition: left 400ms linear 0s;
+  }
+
+  /* Before */
+  section.slide { left: -150%; }
+  /* Now */
+  section.slide[aria-selected] { left: 0; }
+  /* After */
+  section.slide[aria-selected] ~ section.slide { left: +150% }
+
+  section.fade {
+      -moz-transition: opacity 400ms linear 0s;
+      -webkit-transition: opacity 400ms linear 0s;
+      -o-transition: opacity 400ms linear 0s;
+      -ms-transition: opacity 400ms linear 0s;
+      transition: opacity 400ms linear 0s;
+  }
+  section.fadefast {
+      -moz-transition: opacity 200ms linear 0s;
+      -webkit-transition: opacity 200ms linear 0s;
+      -o-transition: opacity 200ms linear 0s;
+      -ms-transition: opacity 200ms linear 0s;
+      transition: opacity 200ms linear 0s;
+  }
+  /* Before */
+  section.fade { opacity: 0; }
+  /* Now */
+  section.fade[aria-selected] { opacity: 1.0; }
+  /* After */
+  section.fade[aria-selected] ~ section.fade { opacity: 0; }
+
+</style>
+
+
+<!-- {{{{ *****************  DZSlides CORE 2.0b1 *************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+<!-- *********************************************************************** -->
+
+<!-- This block of code is not supposed to be edited, but if you want to change the behavior of the slides, feel free to hack it ;) -->
+
+<!-- Default Style -->
+<style>
+  * { margin: 0; padding: 0; }
+  details {display: none; }
+  body {
+    width: 800px; height: 600px;
+    margin-left: -400px; margin-top: -300px;
+    position: absolute; top: 50%; left: 50%;
+    overflow: hidden;
+  }
+  section {
+    position: absolute;
+    pointer-events: none;
+    width: 100%; height: 100%;
+  }
+  section[aria-selected] { pointer-events: auto;}
+  body {display: none}
+  body.loaded {display: block}
+</style>
+
+<script>
+  var friendWindows = [];
+  var idx = 1;
+  var slides;
+
+  /* main() */
+
+  window.onload = function() {
+    slides = document.querySelectorAll("body > section");
+    onhashchange();
+    setSlide();
+    document.body.className = "loaded";
+    onresize();
+  }
+
+  /* Handle keys */
+
+  window.onkeydown = function(e) {
+    // Don't intercept keyboard shortcuts
+    if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) {
+      return;
+    }
+    if ( e.keyCode == 37 // left arrow
+      || e.keyCode == 33 // page up
+    ) {
+      e.preventDefault();
+      back();
+    }
+    if ( e.keyCode == 39 // right arrow
+      || e.keyCode == 34 // page down
+    ) {
+      e.preventDefault();
+      forward();
+    }
+
+    if ( e.keyCode == 32) { // space
+        e.preventDefault();
+        toggleContent();
+    }
+  }
+
+  /* Adapt the size of the slides to the window */
+
+  window.onresize = function() {
+    var sx = document.body.clientWidth / window.innerWidth;
+    var sy = document.body.clientHeight / window.innerHeight;
+    var transform = "scale(" + (1/Math.max(sx, sy)) + ")";
+    document.body.style.MozTransform = transform;
+    document.body.style.WebkitTransform = transform;
+    document.body.style.OTransform = transform;
+    document.body.style.msTransform = transform;
+    document.body.style.transform = transform;
+  }
+  function getDetails(idx) {
+    var s = document.querySelector("section:nth-of-type("+ idx +")");
+    var d = s.querySelector("details");
+    return d?d.innerHTML:"";
+  }
+  window.onmessage = function(e) {
+    msg = e.data;
+    win = e.source;
+    if (msg === "register") {
+      friendWindows.push(win);
+      win.postMessage(JSON.stringify({method: "registered", title: document.title, count: slides.length}), document.location);
+      win.postMessage(JSON.stringify({method: "newslide", details: getDetails(idx), idx: idx}), document.location);
+      return;
+    }
+    if (msg === "back") back();
+    if (msg === "forward") forward();
+    if (msg === "toggleContent") toggleContent();
+    // setSlide(42)
+    var r = /setSlide\((\d+)\)/.exec(msg);
+    if (r) {
+        idx = r[1];
+        setSlide();
+    }
+  }
+
+  /* If a Video is present in this new slide, play it.
+     If a Video is present in the previous slide, stop it. */
+
+  function toggleContent() {
+    var s = document.querySelector("section[aria-selected]");
+    if (s) {
+        var video = s.querySelector("video");
+        if (video) {
+            if (video.ended || video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        }
+    }
+  }
+
+  /* If the user change the slide number in the URL bar, jump
+     to this slide. */
+
+  window.onhashchange = function(e) {
+    var newidx = ~~window.location.hash.split("#")[1];
+    if (!newidx) newidx = 1;
+    if (newidx == idx) return;
+    idx = newidx;
+    setSlide();
+  }
+
+  /* Slide controls */
+
+  function back() {
+    if (idx == 1) return;
+    idx--;
+    setSlide();
+  }
+  function forward() {
+    if (idx >= slides.length) return;
+    idx++;
+    setSlide();
+  }
+  function setSlide() {
+    var old = document.querySelector("section[aria-selected]");
+    var next = document.querySelector("section:nth-of-type("+ idx +")");
+    if (old) {
+      old.removeAttribute("aria-selected");
+      var video = old.querySelector("video");
+      if (video) { video.pause(); }
+    }
+    if (next) {
+      next.setAttribute("aria-selected", "true");
+      //var video = next.querySelector("video");
+      //if (video) { video.play(); }
+    } else {
+      console.warn("No such slide: " + idx);
+      idx = 0;
+      for (var i = 0; i < slides.length; i++) {
+          if (slides[i].hasAttribute("aria-selected")) {
+              idx = i + 1;
+          }
+      }
+    }
+    window.location.hash = idx;
+    for (var i = 0; i < friendWindows.length; i++) {
+        friendWindows[i].postMessage(JSON.stringify({method: "newslide", details: getDetails(idx), idx: idx}), document.location);
+    }
+  }
+</script>
+<!-- vim: set fdm=marker: }}} -->
